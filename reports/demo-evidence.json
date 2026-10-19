@@ -1,0 +1,123 @@
+{
+  "analysis": {
+    "workflow": "Customer onboarding - intentionally broken",
+    "nodes": 5,
+    "edges": 3,
+    "triggers": [
+      "New Customer Webhook"
+    ],
+    "reachable": 4,
+    "findings": [
+      {
+        "code": "HTTP_TIMEOUT",
+        "severity": "medium",
+        "node": "Create CRM Record",
+        "message": "HTTP Request has no explicitly configured timeout",
+        "recommendation": "Set a bounded timeout appropriate to the service"
+      },
+      {
+        "code": "RETRY_IDEMPOTENCY",
+        "severity": "high",
+        "node": "Create CRM Record",
+        "message": "Mutating HTTP request uses retry without demonstrable idempotency",
+        "recommendation": "Use idempotency keys and downstream deduplication"
+      },
+      {
+        "code": "UNREACHABLE",
+        "severity": "high",
+        "node": "Unconnected Metrics",
+        "message": "Node cannot be reached from any trigger",
+        "recommendation": "Review connections and connect intended branch"
+      },
+      {
+        "code": "DISCONNECTED",
+        "severity": "high",
+        "node": "Unconnected Metrics",
+        "message": "Node has no incoming connection",
+        "recommendation": "Connect it to intended predecessor"
+      }
+    ],
+    "summary": {
+      "critical": 0,
+      "high": 3,
+      "medium": 1,
+      "low": 0
+    },
+    "risk_label": "needs attention",
+    "fingerprint": "10d04a0a7fbac6d2"
+  },
+  "changes": [
+    {
+      "node": "Create CRM Record",
+      "code": "HTTP_TIMEOUT",
+      "path": "parameters.options.timeout",
+      "before": null,
+      "after": 10000,
+      "reason": "Bounded 10-second timeout; review according to upstream SLA"
+    }
+  ],
+  "verification": {
+    "before": {
+      "critical": 0,
+      "high": 3,
+      "medium": 1,
+      "low": 0
+    },
+    "after": {
+      "critical": 0,
+      "high": 3,
+      "medium": 0,
+      "low": 0
+    },
+    "resolved_codes": [
+      "HTTP_TIMEOUT"
+    ],
+    "new_codes": [],
+    "static_only": true
+  },
+  "scenarios": [
+    {
+      "scenario": "Missing target node",
+      "finding_present": false,
+      "status": "not flagged",
+      "validation_type": "static rule (no API calls)"
+    },
+    {
+      "scenario": "Unreachable processing branch",
+      "finding_present": true,
+      "status": "flagged",
+      "validation_type": "static rule (no API calls)"
+    },
+    {
+      "scenario": "HTTP timeout absent",
+      "finding_present": true,
+      "status": "flagged",
+      "validation_type": "static rule (no API calls)"
+    },
+    {
+      "scenario": "HTTP retry absent",
+      "finding_present": false,
+      "status": "not flagged",
+      "validation_type": "static rule (no API calls)"
+    },
+    {
+      "scenario": "Mutation retry without idempotency",
+      "finding_present": true,
+      "status": "flagged",
+      "validation_type": "static rule (no API calls)"
+    },
+    {
+      "scenario": "Inline token suspicion",
+      "finding_present": false,
+      "status": "not flagged",
+      "validation_type": "static rule (no API calls)"
+    },
+    {
+      "scenario": "Cyclic graph",
+      "finding_present": false,
+      "status": "not flagged",
+      "validation_type": "static rule (no API calls)"
+    }
+  ],
+  "note": "Computed locally, without n8n or browser execution"
+}
